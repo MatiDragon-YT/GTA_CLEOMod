@@ -26,7 +26,7 @@ ISAUtils* sautils = nullptr;
 // Size of array
 #define sizeofA(__aVar)  ((int)(sizeof(__aVar)/sizeof(__aVar[0])))
 
-MYMODCFG(net.rusjj.cleolib, CLEO Library, 2.0.1.6, Alexander Blade & RusJJ & XMDS)
+MYMODCFG(net.rusjj.cleolib, CLEO Library, 2.0.1.7, Alexander Blade & RusJJ & XMDS)
 BEGIN_DEPLIST()
     ADD_DEPENDENCY_VER(net.rusjj.aml, 1.2.3)
 END_DEPLIST()
@@ -534,6 +534,7 @@ CLEO_Fn(AML_DO_OPCODE_EXIST)
 
 void Init4Opcodes();
 void Init5Opcodes();
+void InitMathOpcodes();
 extern "C" void OnAllModsLoaded()
 {
     if(!cleo) return;
@@ -571,6 +572,9 @@ extern "C" void OnAllModsLoaded()
     Init4Opcodes();
     Init5Opcodes();
     HOOK(ProcessOneCommand, cleo->GetMainLibrarySymbol("_ZN14CRunningScript17ProcessOneCommandEv"));
+
+    // MathOperations Opcodes
+    InitMathOpcodes();
 
     // DMA Fix
     if(*nGameIdent == GTASA)

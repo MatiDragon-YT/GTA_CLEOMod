@@ -8,8 +8,9 @@ Original author of a CLEO on Android is Alexander Blade (http://www.dev-c.com/).
 This one allows mods made specially for AML to communicate with the CLEO. Also, it has NEW settings that you WILL LIKE!
 
 ### I miss the PC opcodes! Can i get them?
-YES! YOU CAN! But not all of them!
-They are implemented in this CLEOMod and are already working, there is no need to enable them somewhere. However, Sanny Builder 3 doesnt know these opcodes, if you want to use them with it, you need to manually add them to the configuration file.
+YES! YOU CAN! But not all of them.
+They are implemented in this CLEOMod and are already working, there is no need to enable them somewhere. However, Sanny Builder 3 doesnt know these opcodes.
+If you want to use them to compile your scripts, you need to manually add them to the configuration file.
 
 Here is how to do this:
 1. Enter the directory of Sanny Builder 3
@@ -139,4 +140,48 @@ Opcodes from CLEO5 in this mod (except debugging ones!!!):
 2000=1, %1d% = get_cleo_arg_count
 2002=-1, cleo_return_with ...
 2003=-1, cleo_return_fail
+```
+
+### Another opcodes
+I also moved MathOperations into the CLEOMod itself! Starting with 2.0.1.7, there is new math opcodes:
+```
+1C00=2,%2d% = to_radian %1d%
+1C01=2,%2d% = to_degree %1d%
+1C02=3,%3d% = modulo_int %1d% %2d%
+1C03=3,%3d% = modulo_float %1d% %2d%
+1C04=2,%2d% = acos %1d%
+1C05=2,%2d% = asin %1d%
+1C06=2,%2d% = atan %1d%
+1C07=2,%2d% = cbrt %1d%
+1C08=2,%2d% = ceil %1d%
+1C09=2,%2d% = cos %1d%
+1C10=2,%2d% = cosh %1d%
+1C11=2,%2d% = expm1 %1d%
+1C12=3,%3d% = fdim %1d% %2d%
+1C13=2,%2d% = floor %1d%
+1C14=3,%3d% = hypot %1d% %2d%
+1C15=4,%4d% = fma %1d% %2d% %3d%
+1C16=3,%3d% = fmax %1d% %2d%
+1C17=3,%3d% = fmin %1d% %2d%
+1C18=2,%2d% = sin %1d%
+1C19=2,%2d% = sinh %1d%
+1C20=2,%2d% = tan %1d%
+1C21=2,%2d% = tanh %1d%
+1C22=3,%3d% = atan2 %1d% %2d%
+1C23=3,%2d% exp %3d% = frexp %1d%
+1C24=3,%3d% = ldexp %1d% exp %2d%
+1C25=3,%2d% intpart %3d% = modf %1d%
+1C26=3,%3d% = scalbn %1d% int_n %2d%
+1C27=2,%2d% = trunc %1d%
+1C28=3,%3d% = remainder %1d% %2d%
+1C29=2,%2d% = fpclassify %1d%
+1C30=4,%4d% = clamp_float %1d% limit %2d% %3d%
+1C31=4,%4d% = clamp_int %1d% limit %2d% %3d%
+1C32=7,%7d% = distance_from %1d% %2d% %3d% to %4d% %5d% %6d%
+1C33=3,%3d% = distance_from %1d% to_vec %2d%
+1C34=5,%5d% = distance2d_from %1d% %2d% to %3d% %4d%
+1C35=3,%3d% = distance2d_from %1d% to_vec %2d%
+1C36=2,%2d% = invsqrt %1d%
+1C37=2,%2d% = tgamma %1d%
+1C38=2,%2d% = lgamma %1d%
 ```

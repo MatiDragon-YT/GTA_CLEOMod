@@ -68,6 +68,16 @@ struct GTAVector3D
     float x, y, z;
     float SqrMagnitude() { return x*x + y*y + z*z; }
     inline GTAVector3D operator-(const GTAVector3D& v) { return { x - v.x, y - v.y, z - v.z }; }
+    inline float GetDistance(GTAVector3D* a)
+    {
+        GTAVector3D b = { x - a->x, y - a->y, z - a->z };
+        return sqrt(b.x * b.x + b.y * b.y + b.z * b.z);
+    }
+    inline float GetDistance2D(GTAVector3D* a)
+    {
+        GTAVector3D b = { x - a->x, y - a->y, 0 };
+        return sqrt(b.x * b.x + b.y * b.y);
+    }
 };
 struct GTAMatrix
 {
