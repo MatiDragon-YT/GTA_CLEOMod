@@ -79,7 +79,7 @@ struct ScmFunction
     ScmFunction(void *thread) : prevScmFunctionId(GetScmFunc(thread))
     {
         // create snapshot of current scope
-        memcpy(savedStack, GetStack(thread), 4 * ValueForSA(8, 6));
+        memcpy(&savedStack, GetStack(thread), sizeof(void*) * ValueForSA(8, 6));
         savedSP = GetStackDepth(thread);
         // create snapshot of parent scope's local variables
         void* scope = (void*)((uintptr_t)thread + ValueForGame(48, 48, 60, 96, 520));
@@ -90,17 +90,17 @@ struct ScmFunction
         savedNotFlag = GetNotFlag(thread);
         memset(savedRets, 0, sizeof(savedRets)); // EXPERIMENTAL
         // init new scope
-        memset(GetStack(thread), 0, 4 * ValueForSA(8, 6));
+        memset(GetStack(thread), 0, sizeof(void*) * ValueForSA(8, 6));
         GetStackDepth(thread) = 0;
         GetCond(thread) = false;
         GetLogicalOp(thread) = eLogicalOperation::NONE;
         GetNotFlag(thread) = false;
-        SetScmFunc(thread, thisScmFunctionId = allocationPlace);
+        SetScmFunc(thread, (thisScmFunctionId = allocationPlace));
     }
     void Return(void *thread)
     {
         // restore parent scope's gosub call stack
-        memcpy(GetStack(thread), savedStack, 4 * ValueForSA(8, 6));
+        memcpy(GetStack(thread), &savedStack, sizeof(void*) * ValueForSA(8, 6));
         GetStackDepth(thread) = savedSP;
         
         // restore parent scope's local variables
