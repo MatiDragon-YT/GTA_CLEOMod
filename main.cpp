@@ -21,6 +21,7 @@ ScriptAddonInfo ScriptAddonInfosStorage[ScriptAddonInfo::allocSize];
 
 char g_szSavesPath[256] { 0 };
 char szCLEOVer[64] { 0 };
+char szGrimoireVer[64] { 0 };
 
 // SAUtils
 #include "isautils.h"
@@ -372,8 +373,9 @@ DECL_HOOKi(ProcessScript, void* handle)
 void SAUtilsStarted()
 {
     snprintf(szCLEOVer, sizeof(szCLEOVer), "CLEOMod v%s", modinfo->VersionString());
-    snprintf(szCLEOVer, sizeof(szCLEOVer), "Grimoire v.1.2.2", modinfo->VersionString());
+    snprintf(szGrimoireVer, sizeof(szGrimoireVer), "Grimoire v.1.2.2", modinfo->VersionString());
     sautils->AddButton(SetType_Mods, szCLEOVer, NoneFunctionLogic);
+    sautils->AddButton(SetType_Mods, szGrimoireVer, NoneFunctionLogic);
     sautils->AddClickableItem(SetType_Game, "CLEO Location", pCfgCLEOLocation->GetInt(), 0, sizeofA(pLocations)-1, pLocations, OnLocationChanged, NULL);
     sautils->AddClickableItem(SetType_Game, "CLEO Red Arrow", pCfgCLEORedArrow->GetInt(), 0, sizeofA(pYesNo)-1, pYesNo, OnRedArrowChanged, NULL);
 }
