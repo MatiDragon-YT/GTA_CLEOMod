@@ -10,6 +10,8 @@
 #include <math.h>
 #include <cstdint>
 
+const int GRIMOIRE_VERSION = 122;
+
 int (*TouchInterface_PositionWidgets)();
 
 /////////////////////////////////////////////////////
@@ -504,6 +506,16 @@ static bool CompareFloats(float a, float b, int op)
         default: return false;
     }
 }
+static int getOperatorFromString(const char* str)
+{
+    if (strcmp(str, "==") == 0) return 0;
+    if (strcmp(str, "!=") == 0) return 1;
+    if (strcmp(str, "<")  == 0) return 2;
+    if (strcmp(str, "<=") == 0) return 3;
+    if (strcmp(str, ">")  == 0) return 4;
+    if (strcmp(str, ">=") == 0) return 5;
+    return -1; // invalid
+}
 
 // out = LOGICAL_OR a b
 CLEO_Fn(LOGICAL_OR)
@@ -525,31 +537,51 @@ CLEO_Fn(IF_TERNARY)
     cleo->GetPointerToScriptVar(handle)->i = (a != 0) ? b : c;
 }
 
-// out = IF_TERNARY_INT A op B ? C : D
+// 700D=6,%6d% = int %1d% op %5d% int %2d% ? any_value %3d% : any_value %4d%
 CLEO_Fn(IF_TERNARY_INT)
 {
     int A  = cleo->ReadParam(handle)->i;
-    int op = cleo->ReadParam(handle)->i;
     int B  = cleo->ReadParam(handle)->i;
+    
     std::uint32_t C  = cleo->ReadParam(handle)->i;
     std::uint32_t D  = cleo->ReadParam(handle)->i;
 
-    std::uint32_t result = CompareInts(A, B, op) ? C : D;
+    int op;
+    char text[2];
 
+    if(IsParamNumber(handle)){
+        op = cleo->ReadParam(handle)->i;
+    }
+    else{
+        CLEO_ReadStringEx(handle, text, sizeof(text));
+        op = getOperatorFromString(text);
+    }
+
+    std::uint32_t result = CompareInts(A, B, op) ? C : D;
     cleo->GetPointerToScriptVar(handle)->i = result;
 }
 
-// out = IF_TERNARY_FLOAT A op B ? C : D
+// 700E=6,%6d% = float %1d% op %5d% float %2d% ? any_value %3d% : any_value %4d%
 CLEO_Fn(IF_TERNARY_FLOAT)
 {
     float A  = cleo->ReadParam(handle)->f;
-    int op = cleo->ReadParam(handle)->i;
     float B  = cleo->ReadParam(handle)->f;
+    
     std::uint32_t C  = cleo->ReadParam(handle)->f;
     std::uint32_t D  = cleo->ReadParam(handle)->f;
 
-    std::uint32_t result = CompareFloats(A, B, op) ? C : D;
+    int op;
+    char text[2];
 
+    if(IsParamNumber(handle)){
+        op = cleo->ReadParam(handle)->f;
+    }
+    else{
+        CLEO_ReadStringEx(handle, text, sizeof(text));
+        op = getOperatorFromString(text);
+    }
+
+    std::uint32_t result = CompareFloats(A, B, op) ? C : D;
     cleo->GetPointerToScriptVar(handle)->i = result;
 }
 
@@ -3150,6 +3182,11 @@ CLEO_Fn(FILE_BYTES_DELETE)
     UpdateCompareFlag(handle, SaveFile(file, buf));
 }
 
+CLEO_Fn(GET_GRIMOIRE_VERSION)
+{
+ 
+    cleo->GetPointerToScriptVar(handle)->i = GRIMOIRE_VERSION;
+}
 
 
 ///////////////////////////////////////////////////
@@ -3244,5 +3281,5 @@ void InitGrimoireOpcodes()
     CLEO_RegisterOpcode(0x7048, FILE_BYTES_INSERT);   // 7048=4,file_bytes_insert %1d% offset %2d% size %3d% data %4d%
     CLEO_RegisterOpcode(0x7049, FILE_BYTES_REPLACE);   // 7049=5,file_bytes_replace %1d% offset %2d% delete_size %3d% data_size %4d% data %5d%
     CLEO_RegisterOpcode(0x7050, FILE_BYTES_DELETE);   // 7050=3,file_bytes_delete %1d% offset %2d% size %3d%
-
+    CLEO_RegisterOpcode(0x7051, GET_GRIMOIRE_VERSION);   // 7051=1,%1d% = get_grimoire_version
 }

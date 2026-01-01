@@ -502,7 +502,7 @@ The difference between each opcode lies mainly in the type of comparison that is
 
 ```js
 700D: 0@ = 22 OP_EQUAL 21 ? 0xfff : 3.14159 // int op (0@ = 3.14159)
-700E: 1@ = 50.0 OP_GREATER 2.33  ? 5.4 : 55@ // float op (0@ = 5.4)
+700E: 1@ = 50.0 ">" 2.33  ? 5.4 : 55@ // float op (0@ = 5.4)
 7014: 2@ = 31@ ? 1.2 : 123 // if 31@ <> 0 then 2@ = 1.2 else 2@ = 123
 ```
 
