@@ -549,7 +549,7 @@ CLEO_Fn(IF_TERNARY_INT)
     int op;
     char text[2];
 
-    if(IsParamNumber(handle)){
+    if(IsParamNum(handle)){
         op = cleo->ReadParam(handle)->i;
     }
     else{
@@ -573,7 +573,7 @@ CLEO_Fn(IF_TERNARY_FLOAT)
     int op;
     char text[2];
 
-    if(IsParamNumber(handle)){
+    if(IsParamNum(handle)){
         op = cleo->ReadParam(handle)->f;
     }
     else{
