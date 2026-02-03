@@ -375,11 +375,15 @@ DECL_HOOKi(ProcessScript, void* handle)
 void SAUtilsStarted()
 {
     snprintf(szCLEOVer, sizeof(szCLEOVer), "CLEOMod v%s", modinfo->VersionString());
-    snprintf(szGrimoireVer, sizeof(szGrimoireVer), "Grimoire v.1.2.2", modinfo->VersionString());
     sautils->AddButton(SetType_Mods, szCLEOVer, NoneFunctionLogic);
-    sautils->AddButton(SetType_Mods, szGrimoireVer, NoneFunctionLogic);
     sautils->AddClickableItem(SetType_Game, "CLEO Location", pCfgCLEOLocation->GetInt(), 0, sizeofA(pLocations)-1, pLocations, OnLocationChanged, NULL);
     sautils->AddClickableItem(SetType_Game, "CLEO Red Arrow", pCfgCLEORedArrow->GetInt(), 0, sizeofA(pYesNo)-1, pYesNo, OnRedArrowChanged, NULL);
+}
+
+void SAUtilsStarted2()
+{
+    snprintf(szGrimoireVer, sizeof(szGrimoireVer), "Grimoire v.1.2.2", modinfo->VersionString());
+    sautils->AddButton(SetType_Mods, szGrimoireVer, NoneFunctionLogic);
 }
 
 ON_MOD_PRELOAD()
@@ -574,7 +578,11 @@ ON_MOD_PRELOAD()
 ON_MOD_LOAD()
 {
     sautils = (ISAUtils*)GetInterface("SAUtils");
-    if(sautils) SAUtilsStarted();
+    if(sautils) {
+        SAUtilsStarted();
+        SAUtilsStarted2();
+    }
+
 }
 
 static char sCleoDir[512] { 0 };
@@ -869,6 +877,7 @@ CLEO_Fn(AML_GET_ALIGNED_VALUE)
 void Init201Opcodes();
 void Init4Opcodes();
 void Init5Opcodes();
+void InitGrimoireOpcodes();
 void InitMathOpcodes();
 __attribute__((__aligned__(4))) char g_ScriptStore[256 * 0x100]; // 0x100 is the size of script in GTA:SA
                                  // (VC has smaller size=0x88 so it's fine to use BIGGER static value)
