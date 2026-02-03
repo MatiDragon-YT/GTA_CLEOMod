@@ -37,9 +37,10 @@ struct CustomScriptRect
 struct ScriptAddonInfo
 {
     static const int allocSize = 0x400;
+    static const int scriptStackSize = 0x200;
 
-    ScriptAddonInfo() { Reset(); }
-    inline void Reset()
+    ScriptAddonInfo() { Reset(NULL); }
+    inline void Reset(char* stackPtr)
     {
         unused = 0xFFFF;
 
@@ -53,6 +54,8 @@ struct ScriptAddonInfo
         enableThreadSaving = false;
         scriptTextures.clear();
         scriptRectsThisFrame = 0;
+
+        scriptVarStackPtr = stackPtr;
     }
 
     inline void* GetScriptTexture(int id)
@@ -75,6 +78,56 @@ struct ScriptAddonInfo
         scriptRectsThisFrame = 0;
     }
 
+    inline char* GetVarStack()
+    {
+        return scriptVarStackPtr;
+    }
+
+    template<typename T>
+    inline void PushVarToStack(T var)
+    {
+        PushStack<T>();
+        *(T*)scriptVarStackPtr = var;
+    }
+
+    template<typename T>
+    inline void PopVarFromStack(T& var)
+    {
+        var = *(T*)scriptVarStackPtr;
+        PopStack<T>();
+    }
+
+    template<typename T = int>
+    inline void PushStack()
+    {
+        size_t Tsize = sizeof(T);
+        if(Tsize & 3) Tsize -= (Tsize & 3 - 4);
+        scriptVarStackPtr -= Tsize;
+    }
+
+    template<typename T = int>
+    inline void PopStack()
+    {
+        size_t Tsize = sizeof(T);
+        if(Tsize & 3) Tsize -= (Tsize & 3 - 4);
+        scriptVarStackPtr += Tsize;
+    }
+
+    inline char* AllocateFromStack(const int bytes)
+    {
+        size_t Tsize = bytes;
+        if(Tsize & 3) Tsize -= (Tsize & 3 - 4);
+        scriptVarStackPtr -= Tsize;
+        return scriptVarStackPtr;
+    }
+
+    inline void DeallocateFromStack(const int bytes)
+    {
+        size_t Tsize = bytes;
+        if(Tsize & 3) Tsize -= (Tsize & 3 - 4);
+        scriptVarStackPtr += Tsize;
+    }
+
     // GetInterfaceVersion() == 1
     std::string workDir;
     std::list<void*> childThreads;
@@ -93,6 +146,10 @@ struct ScriptAddonInfo
     CustomScriptRect scriptRects[64];
 
     // GetInterfaceVersion() == 3
+    cleo_ifs_t::data_t privateVars[32];
+    char* scriptVarStackPtr;
+
+    // GetInterfaceVersion() == 4
     // To Be Added (c)
 };
 
@@ -160,6 +217,10 @@ struct cleo_addon_ifs_t
     int8_t          (*CallDefaultOpcode)(void* handle, uint16_t opcode);
 
     // Interface ver 3
+    void            (*SetPrivateVar)(void* handle, int idx, cleo_ifs_t::data_t value);
+    cleo_ifs_t::data_t (*GetPrivateVar)(void* handle, int idx);
+
+    // Interface ver 4
     // To Be Added (c)
 };
 
