@@ -1,5 +1,4 @@
-<details>
-  <summary><h3>CLEO? For Android?</h3></summary>
+### CLEO? For Android?
 Well, yes! This is a CLEO wrapped in an AML mod!
 Original author of a CLEO on Android is Alexander Blade (http://www.dev-c.com/).
 
@@ -410,8 +409,6 @@ const
     USE_SPEED = 1
 end
 ```
-
-</details>
 
 ## 🌀 Orbit System
 
