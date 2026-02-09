@@ -1304,8 +1304,8 @@ CLEO_Fn(FIND_FIRST_FILE)
                 strncpy(scan->path, str.c_str(), sizeof(scan->path));
                 scan->dir = dir;
 
-                CLEO_WriteStringEx(handle, entry->d_name);
                 cleo->GetPointerToScriptVar(handle)->i = (int)scan;
+                CLEO_WriteStringEx(handle, entry->d_name);
                 UpdateCompareFlag(handle, true);
                 return;
             }
