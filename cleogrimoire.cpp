@@ -10,9 +10,9 @@
 #include <math.h>
 #include <cstdint>
 
-const int GRIMOIRE_VERSION = 122;
+const int GRIMOIRE_VERSION = 123; // versión del grimoire, para control de compatibilidad en scripts
 
-int (*TouchInterface_PositionWidgets)();
+int (*TouchInterface_PositionWidgets)(); // puntero a función que devuelve la base del array de widgets (cada widget es un struct con props en offset 12)
 
 /////////////////////////////////////////////////////
 /////////// BEGIN OPCODES by MatiDragon /////////////
@@ -36,6 +36,7 @@ static inline float* GetWidgetProps(int widgetId)
     return (float*)(widgetPtr + 12);
 }
 
+// 7000=5,set_widget_transform %1d% coords %2d% %3d% scales %4d% %5d%
 CLEO_Fn(SET_WIDGET_TRANSFORM)
 {
     int id = cleo->ReadParam(handle)->i;
@@ -47,6 +48,7 @@ CLEO_Fn(SET_WIDGET_TRANSFORM)
     p[3] = cleo->ReadParam(handle)->f;
 }
 
+// 7001=1,get_widget_transform %1d% coords %2d% %3d% scales %4d% %5d%
 CLEO_Fn(GET_WIDGET_TRANSFORM)
 {
     int id = cleo->ReadParam(handle)->i;
@@ -57,6 +59,99 @@ CLEO_Fn(GET_WIDGET_TRANSFORM)
     out[1].f = p[1];
     out[2].f = p[2];
     out[3].f = p[3];
+}
+
+// 7052=4, is_widget_position %1d% at %2d% %3d% radius %4d%
+CLEO_Fn(IS_WIDGET_POSITION)
+{
+    int id = cleo->ReadParam(handle)->i;
+    float tx = cleo->ReadParam(handle)->f;
+    float ty = cleo->ReadParam(handle)->f;
+    float r = cleo->ReadParam(handle)->f;
+
+    float* p = GetWidgetProps(id);
+    float wx = p[0];
+    float wy = p[1];
+
+    float dx = wx - tx;
+    float dy = wy - ty;
+    float distSq = dx*dx + dy*dy;
+    UpdateCompareFlag(handle, distSq <= r*r);
+}
+
+// 7053=5, is_widget_area %1d% at %2d% %3d% width %4d% height %5d%
+CLEO_Fn(IS_WIDGET_AREA)
+{
+    int id = cleo->ReadParam(handle)->i;
+    float tx = cleo->ReadParam(handle)->f;
+    float ty = cleo->ReadParam(handle)->f;
+    float w = cleo->ReadParam(handle)->f;
+    float h = cleo->ReadParam(handle)->f;
+
+    float* p = GetWidgetProps(id);
+    float wx = p[0];
+    float wy = p[1];
+
+    float halfW = w * 0.5f;
+    float halfH = h * 0.5f;
+    float left   = tx - halfW;
+    float right  = tx + halfW;
+    float top    = ty - halfH;   // asumiendo Y crece hacia abajo, el "top" tiene menor Y
+    float bottom = ty + halfH;
+
+    UpdateCompareFlag(handle, wx >= left && wx <= right && wy >= top && wy <= bottom);
+}
+
+// 7054=5,%2d% %3d% %4d% %5d% = get_widget_screen_bounds %1d%
+CLEO_Fn(GET_WIDGET_SCREEN_BOUNDS)
+{
+    int id = cleo->ReadParam(handle)->i;
+    float* p = GetWidgetProps(id);
+    float x = p[0];
+    float y = p[1];
+    float w = p[2];
+    float h = p[3];
+    float left   = x - w * 0.5f;
+    float right  = x + w * 0.5f;
+    float top    = y - h * 0.5f;
+    float bottom = y + h * 0.5f;
+    cleo->GetPointerToScriptVar(handle)->f = left;
+    cleo->GetPointerToScriptVar(handle)->f = top;
+    cleo->GetPointerToScriptVar(handle)->f = right;
+    cleo->GetPointerToScriptVar(handle)->f = bottom;
+}
+
+// 7055=3,%3d% = get_widget_under_point %1d% %2d%
+CLEO_Fn(GET_WIDGET_UNDER_POINT)
+{
+    float px = cleo->ReadParam(handle)->f;
+    float py = cleo->ReadParam(handle)->f;
+    int maxWidgets = 150; // límite para evitar iterar indefinidamente, el número real de widgets suele ser mucho menor
+    int foundId = -1;
+    if (g_widgetsBase != 0)
+    {
+        for (int i = 0; i < maxWidgets; i++)
+        {
+            uintptr_t widgetPtr = *(uintptr_t*)(g_widgetsBase + (i << 2));
+            if (widgetPtr == 0) continue;
+            float* props = GetWidgetProps(i);
+            float cx = props[0];
+            float cy = props[1];
+            float w = props[2];
+            float h = props[3];
+            float left   = cx - w * 0.5f;
+            float right  = cx + w * 0.5f;
+            float top    = cy - h * 0.5f;
+            float bottom = cy + h * 0.5f;
+            if (px >= left && px <= right && py >= top && py <= bottom)
+            {
+                foundId = i;
+                break;
+            }
+        }
+    }
+    UpdateCompareFlag(handle, foundId != -1);
+    cleo->GetPointerToScriptVar(handle)->i = foundId;
 }
 
 CLEO_Fn(CREATE_FILE_OR_DIRECTORY)
@@ -3188,6 +3283,43 @@ CLEO_Fn(GET_GRIMOIRE_VERSION)
     cleo->GetPointerToScriptVar(handle)->i = GRIMOIRE_VERSION;
 }
 
+// 7056=7, is_point_in_sphere %1d% %2d% %3d% center %4d% %5d% %6d% radius %7d%
+CLEO_Fn(IS_POINT_IN_SPHERE)
+{
+    float px = cleo->ReadParam(handle)->f;
+    float py = cleo->ReadParam(handle)->f;
+    float pz = cleo->ReadParam(handle)->f;
+    float cx = cleo->ReadParam(handle)->f;
+    float cy = cleo->ReadParam(handle)->f;
+    float cz = cleo->ReadParam(handle)->f;
+    float r  = cleo->ReadParam(handle)->f;
+    float dx = px - cx;
+    float dy = py - cy;
+    float dz = pz - cz;
+    float distSq = dx*dx + dy*dy + dz*dz;
+    UpdateCompareFlag(handle, distSq <= r*r);
+}
+
+// 7057=9, is_point_in_box %1d% %2d% %3d% center %4d% %5d% %6d% size %7d% %8d% %9d%
+CLEO_Fn(IS_POINT_IN_BOX)
+{
+    float px = cleo->ReadParam(handle)->f;
+    float py = cleo->ReadParam(handle)->f;
+    float pz = cleo->ReadParam(handle)->f;
+    float cx = cleo->ReadParam(handle)->f;
+    float cy = cleo->ReadParam(handle)->f;
+    float cz = cleo->ReadParam(handle)->f;
+    float sx = cleo->ReadParam(handle)->f;
+    float sy = cleo->ReadParam(handle)->f;
+    float sz = cleo->ReadParam(handle)->f;
+    float hx = sx * 0.5f;
+    float hy = sy * 0.5f;
+    float hz = sz * 0.5f;
+    bool inside = (px >= cx - hx && px <= cx + hx &&
+                   py >= cy - hy && py <= cy + hy &&
+                   pz >= cz - hz && pz <= cz + hz);
+    UpdateCompareFlag(handle, inside);
+}
 
 ///////////////////////////////////////////////////
 //////////// END OPCODES by MatiDragon ////////////
@@ -3282,4 +3414,11 @@ void InitGrimoireOpcodes()
     CLEO_RegisterOpcode(0x7049, FILE_BYTES_REPLACE);   // 7049=5,file_bytes_replace %1d% offset %2d% delete_size %3d% data_size %4d% data %5d%
     CLEO_RegisterOpcode(0x7050, FILE_BYTES_DELETE);   // 7050=3,file_bytes_delete %1d% offset %2d% size %3d%
     CLEO_RegisterOpcode(0x7051, GET_GRIMOIRE_VERSION);   // 7051=1,%1d% = get_grimoire_version
+    CLEO_RegisterOpcode(0x7052, IS_WIDGET_POSITION);   // 7052=4, is_widget_position %1d% at %2d% %3d% radius %4d%
+    CLEO_RegisterOpcode(0x7053, IS_WIDGET_AREA);       // 7053=5, is_widget_area %1d% at %2d% %3d% width %4d% height %5d%
+    CLEO_RegisterOpcode(0x7054, GET_WIDGET_SCREEN_BOUNDS); // 7054=5,%2d% %3d% %4d% %5d% = get_widget_screen_bounds %1d%
+    CLEO_RegisterOpcode(0x7055, GET_WIDGET_UNDER_POINT); // 7055=3,%3d% = get_widget_under_point %1d% %2d%
+    // 80 OPCODES ADDED
+    CLEO_RegisterOpcode(0x7056, IS_POINT_IN_SPHERE);   // 7056=7, is_point_in_sphere %1d% %2d% %3d% center %4d% %5d% %6d% radius %7d%
+    CLEO_RegisterOpcode(0x7057, IS_POINT_IN_BOX);      // 7057=9, is_point_in_box %1d% %2d% %3d% center %4d% %5d% %6d% size %7d% %8d% %9d%
 }

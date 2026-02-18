@@ -371,6 +371,13 @@ SASCM.ini
 7048=4,file_bytes_insert %1d% offset %2d% size %3d% data %4d%
 7049=5,file_bytes_replace %1d% offset %2d% delete_size %3d% data_size %4d% data %5d%
 7050=3,file_bytes_delete %1d% offset %2d% size %3d%
+7051=1,%1d% = get_grimoire_version
+7052=4, is_widget_position %1d% at %2d% %3d% radius %4d%
+7053=5, is_widget_area %1d% at %2d% %3d% width %4d% height %5d%
+7054=5,%2d% %3d% %4d% %5d% = get_widget_screen_bounds %1d%
+7055=3,%3d% = get_widget_under_point %1d% %2d%
+7056=7, is_point_in_sphere %1d% %2d% %3d% center %4d% %5d% %6d% radius %7d%
+7057=9, is_point_in_box %1d% %2d% %3d% center %4d% %5d% %6d% size %7d% %8d% %9d%
 ```
 
 consts.txt
