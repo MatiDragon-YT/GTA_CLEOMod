@@ -3321,6 +3321,159 @@ CLEO_Fn(IS_POINT_IN_BOX)
     UpdateCompareFlag(handle, inside);
 }
 
+
+
+static uintptr_t GetWidgetPtr(int widgetId)
+{
+    if (!g_widgetsBase)
+        g_widgetsBase = (uintptr_t)TouchInterface_PositionWidgets;
+    return *(uintptr_t*)(g_widgetsBase + (widgetId << 2));
+}
+// 7058=2,set_widget_color %1d% color %2d%
+CLEO_Fn(SET_WIDGET_COLOR)
+{
+    int id = cleo->ReadParam(handle)->i;
+    uint32_t color = (uint32_t)cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    if (w) *(uint32_t*)(w + 0x49) = color;   // m_Color offset 0x49
+}
+
+// 7059=2,%2d% = get_widget_color %1d%
+CLEO_Fn(GET_WIDGET_COLOR)
+{
+    int id = cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    uint32_t color = w ? *(uint32_t*)(w + 0x49) : 0;
+    cleo->GetPointerToScriptVar(handle)->i = color;
+}
+
+// 705A=2,set_widget_enabled %1d% enabled %2d%
+CLEO_Fn(SET_WIDGET_ENABLED)
+{
+    int id = cleo->ReadParam(handle)->i;
+    int enabled = cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    if (w) *(bool*)(w + 0x4D) = (enabled != 0);   // m_bEnabled offset 0x4D
+}
+
+// 705B=2,%2d% = get_widget_enabled %1d%
+CLEO_Fn(GET_WIDGET_ENABLED)
+{
+    int id = cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    int enabled = (w && *(bool*)(w + 0x4D)) ? 1 : 0;
+    cleo->GetPointerToScriptVar(handle)->i = enabled;
+}
+
+// 705C=2,set_widget_hid_mapping %1d% mapping %2d%
+CLEO_Fn(SET_WIDGET_HID_MAPPING)
+{
+    int id = cleo->ReadParam(handle)->i;
+    int mapping = cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    if (w) *(int*)(w + 0x04) = mapping;   // m_HIDMapping offset 0x04
+}
+
+// 705D=2,%2d% = get_widget_hid_mapping %1d%
+CLEO_Fn(GET_WIDGET_HID_MAPPING)
+{
+    int id = cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    int mapping = w ? *(int*)(w + 0x04) : 0;
+    cleo->GetPointerToScriptVar(handle)->i = mapping;
+}
+
+// 705E=2,set_widget_user_data %1d% data %2d%
+CLEO_Fn(SET_WIDGET_USER_DATA)
+{
+    int id = cleo->ReadParam(handle)->i;
+    float data = cleo->ReadParam(handle)->f;
+    uintptr_t w = GetWidgetPtr(id);
+    if (w) *(float*)(w + 0x84) = data;   // m_fUserData offset 0x84
+}
+
+// 705F=2,%2d% = get_widget_user_data %1d%
+CLEO_Fn(GET_WIDGET_USER_DATA)
+{
+    int id = cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    float data = w ? *(float*)(w + 0x84) : 0.0f;
+    cleo->GetPointerToScriptVar(handle)->f = data;
+}
+
+// 7060=5,%2d% %3d% %4d% %5d% = get_widget_screen_rect %1d%
+CLEO_Fn(GET_WIDGET_SCREEN_RECT)
+{
+    int id = cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    float rect[4] = {0,0,0,0};
+    if (w)
+    {
+        rect[0] = *(float*)(w + 0x20);   // left
+        rect[1] = *(float*)(w + 0x24);   // top
+        rect[2] = *(float*)(w + 0x28);   // right
+        rect[3] = *(float*)(w + 0x2C);   // bottom
+    }
+    auto out = cleo->GetPointerToScriptVar(handle);
+    out[0].f = rect[0];
+    out[1].f = rect[1];
+    out[2].f = rect[2];
+    out[3].f = rect[3];
+}
+
+// 7061=2,set_widget_fade_rate %1d% rate %2d%
+CLEO_Fn(SET_WIDGET_FADE_RATE)
+{
+    int id = cleo->ReadParam(handle)->i;
+    float rate = cleo->ReadParam(handle)->f;
+    uintptr_t w = GetWidgetPtr(id);
+    if (w) *(float*)(w + 0x1C) = rate;   // m_fFadeRate offset 0x1C
+}
+
+// 7062=2,%2d% = get_widget_fade_rate %1d%
+CLEO_Fn(GET_WIDGET_FADE_RATE)
+{
+    int id = cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    float rate = w ? *(float*)(w + 0x1C) : 0.0f;
+    cleo->GetPointerToScriptVar(handle)->f = rate;
+}
+
+// 7063=2,set_widget_tap_hold_time %1d% time %2d%
+CLEO_Fn(SET_WIDGET_TAP_HOLD_TIME)
+{
+    int id = cleo->ReadParam(handle)->i;
+    float time = cleo->ReadParam(handle)->f;
+    uintptr_t w = GetWidgetPtr(id);
+    if (w) *(float*)(w + 0x44) = time;   // m_fTapHoldTime offset 0x44
+}
+
+// 7064=2,%2d% = get_widget_tap_hold_time %1d%
+CLEO_Fn(GET_WIDGET_TAP_HOLD_TIME)
+{
+    int id = cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    float time = w ? *(float*)(w + 0x44) : 0.0f;
+    cleo->GetPointerToScriptVar(handle)->f = time;
+}
+
+// 7065=2,set_widget_flags %1d% flags %2d%
+CLEO_Fn(SET_WIDGET_FLAGS)
+{
+    int id = cleo->ReadParam(handle)->i;
+    uint32_t flags = (uint32_t)cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    if (w) *(uint32_t*)(w + 0x80) = flags;   // m_nFlags offset 0x80
+}
+
+// 7060=2,%2d% = get_widget_flags %1d%
+CLEO_Fn(GET_WIDGET_FLAGS)
+{
+    int id = cleo->ReadParam(handle)->i;
+    uintptr_t w = GetWidgetPtr(id);
+    uint32_t flags = w ? *(uint32_t*)(w + 0x80) : 0;
+    cleo->GetPointerToScriptVar(handle)->i = flags;
+}
 ///////////////////////////////////////////////////
 //////////// END OPCODES by MatiDragon ////////////
 ///////////////////////////////////////////////////
@@ -3421,4 +3574,20 @@ void InitGrimoireOpcodes()
     // 80 OPCODES ADDED
     CLEO_RegisterOpcode(0x7056, IS_POINT_IN_SPHERE);   // 7056=7, is_point_in_sphere %1d% %2d% %3d% center %4d% %5d% %6d% radius %7d%
     CLEO_RegisterOpcode(0x7057, IS_POINT_IN_BOX);      // 7057=9, is_point_in_box %1d% %2d% %3d% center %4d% %5d% %6d% size %7d% %8d% %9d%
+    CLEO_RegisterOpcode(0x7058, SET_WIDGET_COLOR);     // 7058=2,set_widget_color %1d% color %2d%
+    CLEO_RegisterOpcode(0x7059, GET_WIDGET_COLOR);     // 7059=2,%2d% = get_widget_color %1d%
+    CLEO_RegisterOpcode(0x705A, SET_WIDGET_ENABLED);   // 705A=2,set_widget_enabled %1d% enabled %2d%
+    CLEO_RegisterOpcode(0x705B, GET_WIDGET_ENABLED);   // 705B=2,%2d% = get_widget_enabled %1d%
+    CLEO_RegisterOpcode(0x705C, SET_WIDGET_HID_MAPPING);   // 705C=2,set_widget_hid_mapping %1d% mapping %2d%
+    CLEO_RegisterOpcode(0x705D, GET_WIDGET_HID_MAPPING);   // 705D=2,%2d% = get_widget_hid_mapping %1d%
+    CLEO_RegisterOpcode(0x705E, SET_WIDGET_USER_DATA);   // 705E=2,set_widget_user_data %1d% data %2d%
+    CLEO_RegisterOpcode(0x705F, GET_WIDGET_USER_DATA);   // 705F=2,%2d% = get_widget_user_data %1d%
+    // 90 OPCODES ADDED
+    CLEO_RegisterOpcode(0x7060, GET_WIDGET_SCREEN_RECT);   // 7060=5,%2d% %3d% %4d% %5d% = get_widget_screen_rect %1d%
+    CLEO_RegisterOpcode(0x7061, SET_WIDGET_FADE_RATE);   // 7061=2,set_widget_fade_rate %1d% rate %2d%
+    CLEO_RegisterOpcode(0x7062, GET_WIDGET_FADE_RATE);   // 7062=2,%2d% = get_widget_fade_rate %1d%
+    CLEO_RegisterOpcode(0x7063, SET_WIDGET_TAP_HOLD_TIME);   // 7063=2,set_widget_tap_hold_time %1d% time %2d%
+    CLEO_RegisterOpcode(0x7064, GET_WIDGET_TAP_HOLD_TIME);   // 7064=2,%2d% = get_widget_tap_hold_time %1d%
+    CLEO_RegisterOpcode(0x7065, SET_WIDGET_FLAGS);   // 7065=2,set_widget_flags %1d% flags %2d%
+    CLEO_RegisterOpcode(0x7066, GET_WIDGET_FLAGS);   // 7066=2,%2d% = get_widget_flags %1d%
 }
