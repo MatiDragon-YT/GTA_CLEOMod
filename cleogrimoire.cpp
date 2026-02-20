@@ -3335,7 +3335,7 @@ CLEO_Fn(SET_WIDGET_COLOR)
     int id = cleo->ReadParam(handle)->i;
     uint32_t color = (uint32_t)cleo->ReadParam(handle)->i;
     uintptr_t w = GetWidgetPtr(id);
-    if (w) *(uint32_t*)(w + 0x49) = color;   // m_Color offset 0x49
+    if (w) *(uint32_t*)(w + 0x38) = color;   // m_Color offset 0x38
 }
 
 // 7059=2,%2d% = get_widget_color %1d%
@@ -3343,7 +3343,7 @@ CLEO_Fn(GET_WIDGET_COLOR)
 {
     int id = cleo->ReadParam(handle)->i;
     uintptr_t w = GetWidgetPtr(id);
-    uint32_t color = w ? *(uint32_t*)(w + 0x49) : 0;
+    uint32_t color = w ? *(uint32_t*)(w + 0x38) : 0;
     cleo->GetPointerToScriptVar(handle)->i = color;
 }
 
