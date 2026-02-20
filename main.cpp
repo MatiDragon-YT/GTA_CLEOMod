@@ -392,7 +392,7 @@ void SAUtilsStarted()
 
 void SAUtilsStarted2()
 {
-    snprintf(szGrimoireVer, sizeof(szGrimoireVer), "Grimoire v.1.2.3", modinfo->VersionString());
+    snprintf(szGrimoireVer, sizeof(szGrimoireVer), "Grimoire v.1.2.2", modinfo->VersionString());
     sautils->AddButton(SetType_Mods, szGrimoireVer, NoneFunctionLogic);
 }
 
