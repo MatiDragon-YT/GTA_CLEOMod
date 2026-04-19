@@ -538,6 +538,13 @@ Working with widgets has never been easier than this.
 7001: get_widget_transform 50 coords 0@ 1@ scales 2@ 3@
 ```
 
+```js
+7052:   is_widget_position 50 at 0@ 1@ radius 2@
+7053:   is_widget_area 50 at 0@ 1@ width 2@ height 3@
+7054: $x1 $y1 $x2 $y2 = get_widget_screen_bounds 50
+7055: 0@ = get_widget_under_point 20.0 50.0
+```
+
 ## 😺 Lerp Movement
 
 These commands are used to move a point from initial coordinates to final coordinates at a constant speed, using `deltaTime` to ensure smooth animation that is dependent on the frame rate.
@@ -880,6 +887,17 @@ COLOR_HSV_TO_RGB = 5
 ```
 
 # ChangeLog
+
+## Grimoire v.1.2.3
+```diff
++7051=1,%1d% = get_grimoire_version
++7052=4, is_widget_position %1d% at %2d% %3d% radius %4d%
++7053=5, is_widget_area %1d% at %2d% %3d% width %4d% height %5d%
++7054=5,%2d% %3d% %4d% %5d% = get_widget_screen_bounds %1d%
++7055=3,%3d% = get_widget_under_point %1d% %2d%
++7056=7, is_point_in_sphere %1d% %2d% %3d% center %4d% %5d% %6d% radius %7d%
++7057=9, is_point_in_box %1d% %2d% %3d% center %4d% %5d% %6d% size %7d% %8d% %9d%
+```
 
 ## Grimoire v.1.2.2
 ```diff

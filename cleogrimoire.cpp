@@ -3277,6 +3277,7 @@ CLEO_Fn(FILE_BYTES_DELETE)
     UpdateCompareFlag(handle, SaveFile(file, buf));
 }
 
+// 7051=1,%1d% = get_grimoire_version
 CLEO_Fn(GET_GRIMOIRE_VERSION)
 {
  
