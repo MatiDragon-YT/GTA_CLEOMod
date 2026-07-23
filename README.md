@@ -291,10 +291,10 @@ I also moved MathOperations into the CLEOMod itself! Starting with 2.0.1.7, ther
 
 This is a pack of opcodes to reduce lines of code that are commonly repeated in scripts. It also aims to prevent you from having to write a lot of code in your projects in order to reduce the number of variables you have to use for a simple task.
 
+For your Sanny Builder
 <details>
-  <summary>For your Sanny Builder</summary>
-
-SASCM.ini
+  <summary>SASCM.ini</summary>
+  
 ```ini
 7000=5,set_widget_transform %1d% coords %2d% %3d% scales %4d% %5d%
 7001=1,get_widget_transform %1d% coords %2d% %3d% scales %4d% %5d%
@@ -379,8 +379,11 @@ SASCM.ini
 7056=7, is_point_in_sphere %1d% %2d% %3d% center %4d% %5d% %6d% radius %7d%
 7057=9, is_point_in_box %1d% %2d% %3d% center %4d% %5d% %6d% size %7d% %8d% %9d%
 ```
+</details>
 
-consts.txt
+<details>
+  <summary>consts.txt</summary>
+  
 ```pascal
 const
     // RGB (Red Green Blue)
@@ -423,7 +426,8 @@ const
     USE_SPEED = 1
 end
 ```
-
+</details>
+  
 ## 🌀 Orbit System
 
 Create any orbital shape you want: circles, spheres, ovals, polygons, cubes, rectangles, and more.
